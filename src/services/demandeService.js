@@ -14,4 +14,41 @@ export default {
       throw error;
     }
   },
+  async getNbDemandes()
+  {
+    try{
+    const response = await axios.get(`${API_BASE_URL}/nbDemandes`);
+    console.log(response.data) ;
+    return response.data ;
+      }
+      catch(error)
+      {
+        console.log(error) ;
+      }
+  } ,
+  async getStatusDemandes(status) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/nbStatusDemandes`, {
+        params: { status: status }
+      });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching status demandes:', error);
+      throw error;
+    }
+  } ,
+  async getDemandeById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching demande by ID:', error);
+      throw error;
+    }
+  }
+
+
+
+
 };
