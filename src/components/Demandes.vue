@@ -1,7 +1,6 @@
 <template>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <div class="container mt-4">
     <h4 class="fw-bold mb-4">Suivi des demandes</h4>
@@ -16,7 +15,6 @@
           <h2 class="fw-bold">{{ nbDemandes }}</h2>
         </div>
       </div>
-
 
       <div class="col-md-4 d-flex align-items-center justify-content-center">
         <div class="text-center">
@@ -36,19 +34,16 @@
           <h5 class="fw-bold">Requests Rejected</h5>
           <h2 class="fw-bold">{{ nbRefDemandes }}</h2>
         </div>
-            </div>
-
+      </div>
     </div>
-
-    <br><br><br><br><br>
 
     <div class="container mt-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold">ALL REQUESTS</h4>
         <div class="input-group w-25">
           <input type="search" class="form-control" placeholder="Search" v-model="searchDemande" />
-          <button class="btn btn-outline-secondary dropdown-toggle" type="button">
-            Sort by: Newest
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" @click="toggleSortOrder">
+            Sort by: {{ sortOrder }}
           </button>
         </div>
       </div>
@@ -64,28 +59,30 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="demande in filteredDemandes" :key="demande.id">
+          <tr v-for="demande in sortedDemandes" :key="demande.id">
             <td>{{ demande.id }}</td>
             <td>{{ new Date(demande.dateSoummision).toLocaleDateString() }}</td>
-            <td>Service X</td>
+            <td> {{demande.serviceName }} </td>
             <td>
               <span :class="statusClass(demande.statut)" class="fw-bold">
                 {{ statusEx[demande.statut] }}
               </span>
             </td>
             <td>
-                  <router-link :to="{ name: 'DemandeDetails', params: { id: demande.id } }" class="btn btn-primary btn-sm">See More</router-link>
+              <router-link :to="{ name: 'DemandeDetails', params: { id: demande.id } }" class="btn btn-primary btn-sm">See More</router-link>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+
+  <button @click="getServiceName(1)">  Click</button>
 </template>
 
 <script>
 import demandeService from '@/services/demandeService.js';
-
+import srvService from '@/services/srvService.js' ;
 export default {
   name: 'DemandeTable',
   data() {
@@ -95,18 +92,32 @@ export default {
       nbDemandes: 0,
       nbAccDemandes: 0,
       nbRefDemandes: 0,
-      searchDemande: ''
+      searchDemande: '',
+      sortOrder: 'Oldest' 
     };
   },
   methods: {
     async fetchDemandes() {
-      try {
-        const response = await demandeService.getAllDemandes();
-        this.demandes = response.$values || [];
-      } catch (error) {
-        console.error('Error loading demandes:', error);
+    try {
+      const response = await demandeService.getAllDemandes();
+      const demandes = response.$values || [];
+      
+      for (const demande of demandes) {
+        try {
+          const service = await srvService.getServiceById(demande.serviceId);
+          demande.serviceName = service.name;  
+        } catch (error) {
+          console.error(`Error fetching service name for demande ${demande.id}:`, error);
+          demande.serviceName = 'Unknown';  
+        }
       }
-    },
+      
+      this.demandes = demandes; 
+
+    } catch (error) {
+      console.error('Error loading demandes:', error);
+    }
+  },
     statusClass(statut) {
       switch (statut) {
         case 0:
@@ -141,7 +152,25 @@ export default {
       } catch (error) {
         console.error('Error loading rejected demandes:', error);
       }
+    },
+    toggleSortOrder() {
+      this.sortOrder = this.sortOrder === 'Newest' ? 'Oldest' : 'Newest';
+    } ,
+     async getServiceName(id)
+    {
+      try{
+        var srv = await srvService.getServiceById(id) ;
+       console.log(srv.name) ;
+        return srv.name ;
+      }
+      catch(error)
+      {
+        console.log(error) ;
+      }
     }
+
+   
+
   },
   computed: {
     filteredDemandes() {
@@ -163,7 +192,18 @@ export default {
       return this.demandes.filter(demande => 
         status === null || demande.statut === status
       );
-    }
+    },
+    sortedDemandes() {
+
+      return this.filteredDemandes.slice().sort((a, b) => {
+        if (this.sortOrder === 'Newest') {
+          return new Date(b.dateSoummision) - new Date(a.dateSoummision);
+        } else {
+          return new Date(a.dateSoummision) - new Date(b.dateSoummision);
+        }
+      });
+    } ,
+    
   },
   async created() {
     await this.fetchDemandes();
