@@ -1,6 +1,5 @@
 <template>
 <div>
-    
     <Demandes />
 </div>
 </template>
@@ -10,7 +9,8 @@ import Demandes from "@/components/Demandes.vue" ;
 export default{
     name:"home" , 
     components:{
-        Demandes
+        Demandes 
+        
         
     }
 }

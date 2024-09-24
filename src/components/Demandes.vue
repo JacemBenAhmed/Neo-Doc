@@ -77,7 +77,6 @@
     </div>
   </div>
 
-  <button @click="getServiceName(1)">  Click</button>
 </template>
 
 <script>
@@ -177,12 +176,12 @@ export default {
       if (!this.searchDemande) {
         return this.demandes;
       }
-
+      this.searchDemande=this.searchDemande.toLowerCase() ;
       const statusMap = {
-        "Traité": 2,
-        "Refusé": 3,
-        "En Attente": 0,
-        "En Cours": 1
+        "traité": 2,
+        "refusé": 3,
+        "en attente": 0,
+        "en cours": 1
       };
 
       const status = statusMap[this.searchDemande] !== undefined
@@ -193,6 +192,7 @@ export default {
         status === null || demande.statut === status
       );
     },
+    
     sortedDemandes() {
 
       return this.filteredDemandes.slice().sort((a, b) => {

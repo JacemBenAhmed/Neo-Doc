@@ -3,6 +3,20 @@ import axios from 'axios';
 const API_BASE_URL = 'https://localhost:7014/api/Demande'; 
 
 export default {
+
+  async createDemande(demande) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}`, demande);
+      console.log('Demande created successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating demande:', error);
+      throw error;
+    }
+  },
+
+
+  
   async getAllDemandes() {
     try {
       const response = await axios.get(`${API_BASE_URL}/allDemandes`);
