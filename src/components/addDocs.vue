@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" @click="submitFiles" :disabled="!canSubmit">
+    <button class="btn btn-primary" @click="submitFiles" >
       Confirm Submission
     </button>
 

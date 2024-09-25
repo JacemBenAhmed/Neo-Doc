@@ -6,18 +6,17 @@
     <table class="table">
       <thead>
         <tr>
-            
           <th>ID</th>
           <th>Name</th>
+          <th>Description</th>
           <th>Actions</th>
-
         </tr>
       </thead>
       <tbody>
         <tr v-for="service in services.$values" :key="service.id">
-
           <td>{{ service.id }}</td>
           <td>{{ service.name }}</td>
+          <td>{{ service.description }}</td>
           <td>
             <button class="btn btn-warning" @click="editService(service)">Edit</button>
             <button class="btn btn-danger" @click="deleteService(service.id)">Delete</button>
@@ -26,7 +25,6 @@
       </tbody>
     </table>
 
-    <!-- Create/Update Modal -->
     <div class="modal" tabindex="-1" v-if="showCreateModal || showEditModal">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -39,6 +37,10 @@
               <label for="serviceName" class="form-label">Service Name</label>
               <input type="text" class="form-control" id="serviceName" v-model="serviceForm.name" required>
             </div>
+            <div class="mb-3">
+              <label for="serviceDesc" class="form-label">Service Description</label>
+              <input type="text" class="form-control" id="serviceDesc" v-model="serviceForm.description"> 
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
@@ -47,8 +49,6 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -62,8 +62,8 @@ export default {
       showCreateModal: false,
       showEditModal: false,
       serviceForm: {
-        id: null,
-        name: ''
+        name: '',
+        description: '' 
       },
       isEditing: false,
     };
@@ -72,38 +72,43 @@ export default {
     async fetchServices() {
       this.services = await getAllServices();
     },
+
     async createService() {
       const newService = await createService(this.serviceForm);
       if (newService) {
-        this.services.push(newService);
+        alert("Service added successfully!");
         this.closeModal();
+        await this.fetchServices(); 
       }
     },
+
     async deleteService(id) {
       const success = await deleteService(id);
       if (success) {
-        this.services = this.services.filter(service => service.id !== id);
+        alert("Service deleted successfully!");
+        await this.fetchServices(); 
       }
     },
+
     editService(service) {
       this.serviceForm = { ...service };
       this.isEditing = true;
       this.showEditModal = true;
     },
+
     async updateService() {
       const updatedService = await updateService(this.serviceForm.id, this.serviceForm);
       if (updatedService) {
-        const index = this.services.findIndex(s => s.id === this.serviceForm.id);
-        if (index !== -1) {
-          this.services.splice(index, 1, updatedService);
-        }
+        alert("Service updated successfully!");
         this.closeModal();
+        await this.fetchServices(); 
       }
     },
+
     closeModal() {
       this.showCreateModal = false;
       this.showEditModal = false;
-      this.serviceForm = { id: null, name: '' };
+      this.serviceForm = { id: null, name: '', description: '' }; 
       this.isEditing = false;
     }
   },
@@ -115,6 +120,6 @@ export default {
 
 <style scoped>
 .modal {
-  display: block; /* Enable modal display */
+  display: block; 
 }
 </style>

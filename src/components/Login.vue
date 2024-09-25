@@ -54,7 +54,8 @@ export default {
       try {
         const response = await axios.post('https://localhost:7014/User/login', payload);
 
-        localStorage.setItem('token', response.data.token);
+         localStorage.setItem('token', response.data.token);
+         console.log(response.data.token) ;
         alert('Login successful');
         this.$router.push('/');
 

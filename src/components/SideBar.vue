@@ -1,7 +1,5 @@
-<!-- src/components/Sidebar.vue -->
 <template>
   <div>
-    <!-- Sidebar Toggle Button for Mobile -->
     <button
       class="btn btn-primary d-md-none position-fixed"
       @click="toggleSidebar"
@@ -11,7 +9,6 @@
       <i class="lni lni-menu"></i>
     </button>
 
-    <!-- Sidebar -->
     <nav
       :class="['sidebar bg-dark text-white', { 'sidebar-collapsed': isCollapsed }]"
       @click.stop
@@ -35,18 +32,16 @@
             <span v-if="!isCollapsed">Suivi Demandes</span>
           </router-link>
         </li>
-     
-     
         <li class="nav-item">
           <router-link to="/addDocs" class="nav-link text-white" active-class="active">
             <i class="lni lni-popup"></i>
             <span v-if="!isCollapsed">Ajout Demande</span>
           </router-link>
         </li>
-         <li class="nav-item">
+        <li class="nav-item">
           <router-link to="/users" class="nav-link text-white" active-class="active">
             <i class="lni lni-popup"></i>
-            <span v-if="!isCollapsed">edit utilisateurs</span>
+            <span v-if="!isCollapsed">Edit Utilisateurs</span>
           </router-link>
         </li>
         <li class="nav-item">
@@ -55,13 +50,25 @@
             <span v-if="!isCollapsed">Services</span>
           </router-link>
         </li>
-     
       </ul>
+
       <div class="sidebar-footer p-3">
-        <router-link to="/logout" class="nav-link text-white" active-class="active">
-          <i class="lni lni-exit"></i>
-          <span v-if="!isCollapsed">Logout</span>
-        </router-link>
+        <div v-if="isLoggedIn">
+          <a href="#" class="nav-link text-white" @click.prevent="logout">
+            <i class="lni lni-exit"></i>
+            <span v-if="!isCollapsed">Logout</span>
+          </a>
+        </div>
+        <div v-else>
+          <router-link to="/login" class="nav-link text-white">
+            <i class="lni lni-lock"></i>
+            <span v-if="!isCollapsed">Login</span>
+          </router-link>
+          <router-link to="/register" class="nav-link text-white">
+            <i class="lni lni-user-add"></i>
+            <span v-if="!isCollapsed">Register</span>
+          </router-link>
+        </div>
       </div>
     </nav>
   </div>
@@ -73,20 +80,33 @@ export default {
   data() {
     return {
       isCollapsed: false,
-      isDropdownOpen: {
-        auth: false,
-        multi: false,
-        multiTwo: false,
-      },
+      isLoggedIn: !!localStorage.getItem('token'),
     };
   },
   methods: {
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
     },
-    toggleDropdown(menu) {
-      this.$set(this.isDropdownOpen, menu, !this.isDropdownOpen[menu]);
+    logout() {
+      localStorage.removeItem('token');
+      this.isLoggedIn = false; // Update the reactive state immediately
+      this.$emit('logout'); // Emit logout event if needed
+      this.$router.push('/login'); // Redirect to the login page
     },
+    updateLoginState() {
+      this.isLoggedIn = !!localStorage.getItem('token'); // Update state based on token
+    },
+  },
+  watch: {
+    '$route'(to, from) {
+      this.updateLoginState();
+    }
+  },
+  created() {
+    window.addEventListener('storage', this.updateLoginState);
+  },
+  beforeDestroy() {
+    window.removeEventListener('storage', this.updateLoginState);
   },
 };
 </script>

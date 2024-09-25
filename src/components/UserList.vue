@@ -1,174 +1,105 @@
 <template>
-  <v-container>
-    <h2>User List</h2>
-    <v-data-table
-      :headers="headers"
-      :items="users"
-      item-key="id"
-      class="elevation-1"
-    >
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-btn icon @click="editUser(item)">
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn icon @click="deleteUser(item.id)">
-          <v-icon color="red">mdi-delete</v-icon>
-        </v-btn>
-      </template>
-    </v-data-table>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <div class="container mt-4">
+    <h4 class="fw-bold mb-4">User List</h4>
 
-    <!-- Modal for Editing User -->
-    <v-dialog v-model="showModal" max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Edit User</span>
-        </v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="updateUser">
-            <v-text-field
-              v-model="selectedUser.firstName"
-              label="First Name"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="selectedUser.lastName"
-              label="Last Name"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="selectedUser.email"
-              label="Email"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="selectedUser.city"
-              label="City"
-            ></v-text-field>
-            <v-text-field
-              v-model="selectedUser.phoneNumber"
-              label="Phone Number"
-            ></v-text-field>
-            <v-select
-              v-model="selectedUser.role"
-              :items="['agent', 'admin']"
-              label="Role"
-            ></v-select>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeModal">
-            Cancel
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="updateUser">
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+    <div class="container mt-5">
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">User ID</th>
+            <th scope="col">firstName</th>
+            <th scope="col">LastName</th>
+            <th scope="col">Email</th>
+            <th scope="col">City</th>
+            <th scope="col">Role</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users.$values" :key="user.id">
+            <td>{{ user.id }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.city }}</td>
+            <td>{{ user.role }}</td>
+            
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <script>
-import axios from 'axios';
+import userService from '@/services/userService.js';
 
 export default {
+  name: 'UserTable',
   data() {
     return {
       users: [],
-      selectedUser: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        city: '',
-        phoneNumber: '',
-        role: '',
-      },
-      showModal: false,
-      headers: [
-        { text: 'First Name', value: 'firstName' },
-        { text: 'Last Name', value: 'lastName' },
-        { text: 'Email', value: 'email' },
-        { text: 'City', value: 'city' },
-        { text: 'Phone Number', value: 'phoneNumber' },
-        { text: 'Role', value: 'role' },
-        { text: 'Actions', value: 'actions', sortable: false },
-      ],
-      token: localStorage.getItem('token') || '',
+      searchUser: '',
+      sortOrder: 'Oldest',
     };
   },
-  async created() {
-    await this.fetchUsers();
+  async mounted() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.$router.push('/login');
+      return;
+    }
+    console.log("token : " + token) ;
+
+    try {
+      const response = await userService.getUsers(token);
+      this.users = response.data;
+      console.log(this.users);
+    } catch (error) {
+      alert('Error fetching users: ' + error.response.data);
+    }
   },
+
   methods: {
-    async fetchUsers() {
-      try {
-        const response = await axios.get('https://localhost:7036/User/users', {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        });
-        this.users = response.data;
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-      }
-    },
-    editUser(user) {
-      this.selectedUser = { ...user };
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedUser = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        city: '',
-        phoneNumber: '',
-        role: '',
-      };
-    },
-    async updateUser() {
-      try {
-        await axios.put(`https://localhost:7036/User/update/${this.selectedUser.id}`, this.selectedUser, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        });
-        alert('User updated successfully');
-        await this.fetchUsers();
-        this.closeModal();
-      } catch (error) {
-        console.error('Failed to update user:', error.response || error.message);
-        alert('Failed to update user');
-      }
-    },
     async deleteUser(id) {
+      const token = localStorage.getItem('jwt');
       if (confirm('Are you sure you want to delete this user?')) {
         try {
-          await axios.delete(`https://localhost:7014/User/delete/${id}`, {
-            headers: {
-              Authorization: `Bearer ${this.token}`,
-            },
-          });
-          alert('User deleted successfully');
-          await this.fetchUsers();
+          await userService.deleteUser(id, token);
+          this.users = this.users.filter(user => user.id !== id);
         } catch (error) {
-          console.error('Failed to delete user:', error.response || error.message);
-          alert('Failed to delete user');
+          alert('Error deleting user: ' + error.response.data);
         }
       }
-    },
+    } ,
+    showusers()
+    {
+      console.log(this.users) ;
+    }
   },
+  
+  
 };
 </script>
 
 <style scoped>
-.v-data-table {
-  margin-bottom: 20px;
+.table th {
+  color: #777575;
 }
 
-.v-btn {
-  margin-right: 10px;
+.table td {
+  font-size: 0.9rem; 
+  vertical-align: middle; 
+}
+
+.input-group .form-control {
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.input-group .btn {
+  border-radius: 0 0.375rem 0.375rem 0;
 }
 </style>

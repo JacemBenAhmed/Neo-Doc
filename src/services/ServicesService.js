@@ -24,7 +24,7 @@ async function createService(serviceData) {
 
 async function deleteService(id) {
   try {
-    await axios.delete(BASE_URL + id);
+    await axios.delete(BASE_URL +"/"+ id);
     return true;
   } catch (e) {
     console.log(e);
@@ -35,7 +35,7 @@ async function updateService(id, updatedItem) {
   try {
     console.log("Updating service with ID:", id);
     console.log("Data being sent:", updatedItem);
-    const response = await axios.put(BASE_URL + id, updatedItem);
+    const response = await axios.put(BASE_URL +"/"+ id, updatedItem);
     return response;
   } catch (e) {
     console.log("Error in updateService:", e);
