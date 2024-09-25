@@ -3,7 +3,6 @@
     <h4>Upload files</h4>
     <p>Select and upload the files of your choice</p>
 
-    <!-- Input for file upload -->
     <div class="upload-box border rounded p-3 mb-3">
       <input
         type="file"
@@ -13,10 +12,9 @@
       />
     </div>
 
-    <!-- File list display -->
-    <div v-if="files.length > 0" class="file-list">
+    <div v-if="documents.length > 0" class="file-list">
       <div
-        v-for="(file, index) in files"
+        v-for="(file, index) in documents"
         :key="index"
         class="file-item d-flex align-items-center justify-content-between border p-2 mb-2"
       >
@@ -36,36 +34,39 @@
       </div>
     </div>
 
-    <!-- Buttons to confirm submission or add demande -->
     <button class="btn btn-primary" @click="submitFiles" :disabled="!canSubmit">
       Confirm Submission
     </button>
 
-    <button class="btn btn-primary mt-2" @click="addDemande" :disabled="!canSubmit">
+    <button class="btn btn-primary mt-2" @click="addDemande" >
       Add Demande
     </button>
+    <button class="btn btn-primary mt-2" @click="clearFiles">Clear Docs</button>
   </div>
 </template>
 
 <script>
+import documentService from '@/services/documentService.js';
+
 export default {
   data() {
     return {
-      files: [], // Array to store uploaded files
+      files: [],
+      documents: []
     };
   },
   computed: {
     canSubmit() {
-      return this.files.length > 0; // Enables buttons if there are files
+      return this.files.length > 0;
     },
   },
   methods: {
-    // Handles the file upload process
     handleFileUpload(event) {
       const uploadedFiles = event.target.files;
       for (let i = 0; i < uploadedFiles.length; i++) {
         const file = uploadedFiles[i];
         const newFile = {
+          fileObj: file,
           nomFichier: file.name,
           documentType: this.getDocumentType(file.type),
           uploading: true,
@@ -73,37 +74,85 @@ export default {
         };
         this.files.push(newFile);
 
-        // Simulate file upload completion
         setTimeout(() => {
           newFile.uploading = false;
           newFile.completed = true;
         }, 2000);
       }
-      localStorage.setItem('uploadedFiles', JSON.stringify(this.files)); // Save files in local storage
+
+      localStorage.setItem('uploadedFiles', JSON.stringify(this.files.map(f => ({
+        nomFichier: f.nomFichier,
+        documentType: f.documentType,
+        fileObj: f.fileObj,
+        uploading: f.uploading,
+        completed: f.completed
+      }))));
     },
-    // Determines the document type based on the MIME type
+
     getDocumentType(mimeType) {
       if (mimeType.includes('pdf')) return 'PDF';
       else if (mimeType.includes('jpeg') || mimeType.includes('png')) return 'Image';
       else if (mimeType.includes('mp4')) return 'Video';
       else return 'Unknown';
     },
-    // Submits the files for further processing
-    submitFiles() {
+
+    async submitFiles() {
       console.log('Submitting files:', this.files);
-      // Additional file submission logic here (API call, etc.)
+      for (const file of this.files) {
+        const documentTypes = 0;
+        const fileObj = file.fileObj;
+
+        if (!fileObj) {
+          console.error('File object is missing for:', file);
+          continue;
+        }
+
+        try {
+          const documentResponse = await documentService.createDocument(1021, documentTypes, fileObj);
+          console.log('Document created successfully:', documentResponse);
+        } catch (error) {
+          console.error('Error creating document:', error.response?.data || error.message);
+        }
+      }
     },
-    // Redirects to the addDemande page
+
     addDemande() {
-      localStorage.setItem('uploadedFiles', JSON.stringify(this.files)); // Ensure files are stored
-      this.$router.push('/addDemande'); // Navigate to the "addDemande" route
+      localStorage.setItem('uploadedFiles', JSON.stringify(this.files));
+      this.$router.push('/addDemande');
+    },
+
+    clearFiles() {
+      this.documents = [];
+      //localStorage.removeItem('uploadedFiles');
+    },
+
+    async fetchDocuments() {
+      try {
+        const response = await documentService.getDocumentByID(1021);
+        console.log('API Response:', response);
+
+        this.documents = Array.isArray(response.$values) ? response.$values.map(file => ({
+          ...file,
+          uploading: false,
+          completed: true,
+        })) : [];
+      } catch (error) {
+        console.error('Error fetching documents:', error.message);
+      }
+
+      console.log("files: ", this.documents);
     },
   },
   mounted() {
-    // Load files from localStorage if they exist
+    this.fetchDocuments(); // Call fetchDocuments to get the documents on component mount
+
     const storedFiles = localStorage.getItem('uploadedFiles');
     if (storedFiles) {
-      this.files = JSON.parse(storedFiles);
+      this.files = JSON.parse(storedFiles).map(f => ({
+        ...f,
+        uploading: false,
+        completed: true,
+      }));
     }
   },
 };

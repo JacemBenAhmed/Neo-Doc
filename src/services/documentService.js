@@ -2,28 +2,45 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://localhost:7014/api/Document'; 
 
+
+
+
+const API = 'https://localhost:7014/api/Document/';
 export default {
  
   async createDocument(demandeId, documentTypes, file) {
     try {
       const formData = new FormData();
+      formData.append('file', file);
       formData.append('demandeId', demandeId);
       formData.append('documentTypes', documentTypes);
-      formData.append('file', file); 
 
-      const response = await axios.post(`${API_BASE_URL}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
 
+      const response = await axios.post(API_BASE_URL, formData);
       console.log('Document uploaded successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error uploading document:', error);
+      console.error('Error uploading document:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  async getDocumentByID(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/idDemande`, {
+        params: { id }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching demande by ID:', error);
       throw error;
     }
   }
+  
+  
   ,
 
   async getDocumentByID(id) {
@@ -38,6 +55,19 @@ export default {
       throw error;
     }
   }
+  ,
+  
+  async updateDocumentDemandeId(newDemandeId) {
+    try {
+      const response = await axios.put(`${API}${newDemandeId}`);
+      console.log('Documents updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating documents:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+  
 
 
 
