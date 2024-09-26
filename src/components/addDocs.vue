@@ -99,7 +99,7 @@ export default {
     async submitFiles() {
       console.log('Submitting files:', this.files);
       for (const file of this.files) {
-        const documentTypes = 0;
+        const documentTypes = this.getDocumentType(file.nomFichier);
         const fileObj = file.fileObj;
 
         if (!fileObj) {

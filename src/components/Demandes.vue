@@ -35,6 +35,28 @@
           <h2 class="fw-bold">{{ nbRefDemandes }}</h2>
         </div>
       </div>
+      <div class="col-md-4 d-flex align-items-center justify-content-center">
+
+
+    <div class="text-center">
+        <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
+        <i class="fas fa-hourglass-half text-warning" style="font-size: 2rem;"></i>
+        </div>
+        <h5 class="fw-bold">Requests Pending</h5>
+        <h2 class="fw-bold">{{ nbAttDemandes }}</h2>
+    </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-center justify-content-center">
+    <div class="text-center">
+        <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
+        <i class="fas fa-spinner text-primary" style="font-size: 2rem;"></i>
+        </div>
+        <h5 class="fw-bold">Requests In Progress</h5>
+        <h2 class="fw-bold">{{ nbCoursDemandes }}</h2>
+    </div>
+    </div>
+
+
     </div>
 
     <div class="container mt-5">
@@ -92,7 +114,10 @@ export default {
       nbAccDemandes: 0,
       nbRefDemandes: 0,
       searchDemande: '',
-      sortOrder: 'Oldest' 
+      sortOrder: 'Oldest' ,
+      nbCoursDemandes:'',
+      nbAttDemandes:'',
+      
     };
   },
   methods: {
@@ -141,6 +166,20 @@ export default {
     async fetchNbAccDemandes() {
       try {
         this.nbAccDemandes = await demandeService.getStatusDemandes(2); 
+      } catch (error) {
+        console.error('Error loading accepted demandes:', error);
+      }
+    },
+    async fetchNbAttDemandes() {
+      try {
+        this.nbAttDemandes = await demandeService.getStatusDemandes(0); 
+      } catch (error) {
+        console.error('Error loading accepted demandes:', error);
+      }
+    },
+    async fetchNbCoursDemandes() {
+      try {
+        this.nbCoursDemandes = await demandeService.getStatusDemandes(1); 
       } catch (error) {
         console.error('Error loading accepted demandes:', error);
       }
@@ -210,6 +249,10 @@ export default {
     await this.fetchNbDemandes();
     await this.fetchNbAccDemandes();
     await this.fetchNbRefDemandes();
+    await this.fetchNbCoursDemandes();
+    await this.fetchNbAttDemandes();
+    
+
   }
 };
 </script>

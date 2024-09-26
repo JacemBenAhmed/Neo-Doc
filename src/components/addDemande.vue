@@ -9,8 +9,6 @@
             <th>File Name</th>
             <th>Format</th>
             <th>User Id</th>
-            <th>Submission Id</th>
-            <th>Description</th>
             <th>Service</th>
           </tr>
         </thead>
@@ -18,16 +16,8 @@
           <tr v-for="(file, index) in files" :key="index">
             <td>{{ file.nomFichier }}</td>
             <td>{{ file.documentType }}</td>
-            <td>{{ userId }}</td>
-            <td>{{ submissionId }}</td>
-            <td>
-              <input
-                type="text"
-                v-model="file.description"
-                class="form-control"
-                placeholder="Add a description"
-              />
-            </td>
+            <td>{{ userIdd }}</td>
+            
             <td>
               <select v-model="serviceId" class="form-select">
                 <option v-for="service in services.$values" :key="service.id" :value="service.id" >
@@ -58,7 +48,7 @@ import { getAllServices, createService, deleteService, updateService } from '@/s
 export default {
   data() {
     return {
-      userId: '0001',
+      userIdd: localStorage.getItem('userId'),
       submissionId: '7795',
       files: [] ,
       services:[] , 
@@ -68,6 +58,7 @@ export default {
   mounted() {
     this.fetchDocuments();
     this.fetchServices() ;
+    
   },
   methods: {
     async fetchDocuments() {
@@ -97,9 +88,13 @@ export default {
     },
 
     async submitDemande() {
+
+
+      const userIdd = localStorage.getItem('userId');
+      //console.log("aa :"+userIdd) ;
       const demandeData = {
         id: 0,
-        userId: 0,
+        userId: userIdd, // a reparer avec token ou bien api getUserById
         dateSoummision: new Date(),
         statut: 0,
         serviceId: this.serviceId,
@@ -129,7 +124,8 @@ async fetchServices() {
       this.services = await getAllServices();
       console.log(this.services) ;
     },
- 
+    
+    
 
 
 
@@ -140,6 +136,8 @@ async fetchServices() {
    
   }
 };
+
+
 </script>
 
 <style scoped>

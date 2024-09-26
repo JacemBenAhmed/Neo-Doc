@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <!-- src/components/LoginForm.vue -->
 <template>
   <div class="container">
@@ -13,21 +12,11 @@
           <input v-model="password" type="password" required />
           <label>Password</label>
         </div>
-        <div class="content">
-          <div class="checkbox">
-            <input type="checkbox" id="remember-me" v-model="rememberMe" />
-            <label for="remember-me">Remember me</label>
-          </div>
-          <div class="pass-link">
-            <a href="#">Forgot password?</a>
-          </div>
-        </div>
+      
         <div class="field">
           <input type="submit" value="Login" />
         </div>
-        <div class="signup-link">
-          Not a member? <a href="/register">Signup now</a>
-        </div>
+        
       </form>
     </div>
   </div>
@@ -35,6 +24,7 @@
 
 <script>
 import axios from 'axios';
+import VueJwtDecode from 'vue-jwt-decode'
 
 export default {
   data() {
@@ -49,20 +39,29 @@ export default {
       const payload = {
         email: this.email,
         password: this.password,
-        rememberMe: this.rememberMe,
       };
       try {
         const response = await axios.post('https://localhost:7014/User/login', payload);
 
-         localStorage.setItem('token', response.data.token);
-         console.log(response.data.token) ;
-        alert('Login successful');
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+      
+        const decoded = VueJwtDecode.decode(token);
+        
+        localStorage.setItem('userRole', decoded.role); 
+        localStorage.setItem('userId', decoded.nameid); 
+
+        console.log(decoded.nameid) ;
+        console.log(decoded.role) ;
+         
+         
+        //alert('Login successful');
+
         this.$router.push('/');
 
-        
+
+
       } catch (error) {
-
-
         if (error.response) {
           console.error('Error response', error.response.data);
           alert(`Login failed: ${error.response.data.message || 'Invalid credentials'}`);
@@ -98,11 +97,11 @@ body {
 }
 
 .wrapper {
-  width: 380px;
+  width: 520px; /* Increased width */
   background: #fff;
   border-radius: 15px;
   box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 30px; /* Increased padding */
 }
 
 .wrapper .title {
@@ -113,7 +112,7 @@ body {
   color: #fff;
   user-select: none;
   border-radius: 15px 15px 0 0;
-  background: linear-gradient(-135deg, #c850c0, #4158d0);
+  background: linear-gradient(-135deg, #074b0a, #4158d0);
 }
 
 .wrapper form {
@@ -121,7 +120,7 @@ body {
 }
 
 .wrapper form .field {
-  height: 50px;
+  height: 100px; /* Increased height */
   width: 100%;
   margin-top: 20px;
   position: relative;
@@ -131,7 +130,7 @@ body {
   height: 100%;
   width: 100%;
   outline: none;
-  font-size: 17px;
+  font-size: 20px; /* Increased font size */
   padding-left: 20px;
   border: 1px solid lightgrey;
   border-radius: 25px;
@@ -159,7 +158,7 @@ form .field input:focus ~ label,
 form .field input:valid ~ label {
   top: 0%;
   font-size: 16px;
-  color: #4158d0;
+  color: #0e5a21;
   background: #fff;
   transform: translateY(-50%);
 }
@@ -196,10 +195,10 @@ form .field input[type='submit'] {
   border: none;
   padding-left: 0;
   margin-top: -10px;
-  font-size: 20px;
+  font-size: 30px; /* Increased font size */
   font-weight: 500;
   cursor: pointer;
-  background: linear-gradient(-135deg, #c850c0, #4158d0);
+  background: linear-gradient(-135deg, #065031, #4158d0);
   transition: all 0.3s ease;
 }
 
@@ -215,7 +214,7 @@ form .signup-link {
 
 form .pass-link a,
 form .signup-link a {
-  color: #4158d0;
+  color: #075220;
   text-decoration: none;
 }
 

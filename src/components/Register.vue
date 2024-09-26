@@ -35,15 +35,13 @@
           <span class="details">Role</span>
           <select v-model="role" required>
             <option value="agent">Agent</option>
-            <option value="admin">Admin</option>
+            <option value="client">client</option>
           </select>
         </div>
         <div class="button">
           <input type="submit" value="Register">
         </div>
-        <div class="button">
-          <input type="button" value="Go to Login" @click="goToLogin">
-        </div>
+        
       </form>
     </div>
   </div>
@@ -80,7 +78,7 @@ export default {
         const response = await axios.post('https://localhost:7014/User/register', payload);
         console.log(response.data);
         alert('Registration successful');
-        this.$router.push('/login');
+        //this.$router.push('/login');
       } catch (error) {
         console.error('Registration failed:', error.response || error.message);
         alert('Registration failed: ' + (error.response?.data?.message || 'An error occurred'));

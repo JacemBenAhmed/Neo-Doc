@@ -10,9 +10,7 @@
     </button>
 
     <nav
-      :class="['sidebar bg-dark text-white', { 'sidebar-collapsed': isCollapsed }]"
-      @click.stop
-    >
+      :class="['sidebar bg-dark text-white', { 'sidebar-collapsed': isCollapsed }]">
       <div class="sidebar-header d-flex align-items-center justify-content-between p-3">
         <router-link to="/" class="sidebar-logo text-white h5 mb-0">NeoDocs</router-link>
         <button class="btn btn-sm btn-dark d-none d-md-block" @click="toggleSidebar">
@@ -21,33 +19,45 @@
       </div>
       <ul class="nav flex-column">
         <li class="nav-item">
-          <router-link to="/profile" class="nav-link text-white" active-class="active">
+          <router-link to="/editProfile" class="nav-link text-white" active-class="active">
             <i class="lni lni-user"></i>
             <span v-if="!isCollapsed">Profile</span>
           </router-link>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="isAdminOrAgent">
           <router-link to="/" class="nav-link text-white" active-class="active">
             <i class="lni lni-agenda"></i>
             <span v-if="!isCollapsed">Suivi Demandes</span>
           </router-link>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="isAdminOrAgent">
           <router-link to="/addDocs" class="nav-link text-white" active-class="active">
             <i class="lni lni-popup"></i>
             <span v-if="!isCollapsed">Ajout Demande</span>
           </router-link>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="isAdmin">
           <router-link to="/users" class="nav-link text-white" active-class="active">
             <i class="lni lni-popup"></i>
             <span v-if="!isCollapsed">Edit Utilisateurs</span>
           </router-link>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="isAdmin">
           <router-link to="/services" class="nav-link text-white" active-class="active">
             <i class="lni lni-cog"></i>
             <span v-if="!isCollapsed">Services</span>
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="isAdmin">
+          <router-link to="/register" class="nav-link text-white" active-class="active">
+            <i class="lni lni-cog"></i>
+            <span v-if="!isCollapsed">register</span>
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="isClient">
+          <router-link to="/dashboardUser" class="nav-link text-white" active-class="active">
+            <i class="lni lni-cog"></i>
+            <span v-if="!isCollapsed">Dashboard</span>
           </router-link>
         </li>
       </ul>
@@ -81,7 +91,22 @@ export default {
     return {
       isCollapsed: false,
       isLoggedIn: !!localStorage.getItem('token'),
+      role: localStorage.getItem('userRole')
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.role === 'admin';
+    },
+    isAgent() {
+      return this.role === 'agent';
+    },
+    isClient() {
+      return this.role === 'client';
+    },
+    isAdminOrAgent() {
+      return this.isAdmin || this.isAgent;
+    }
   },
   methods: {
     toggleSidebar() {
@@ -89,12 +114,14 @@ export default {
     },
     logout() {
       localStorage.removeItem('token');
-      this.isLoggedIn = false; // Update the reactive state immediately
-      this.$emit('logout'); // Emit logout event if needed
-      this.$router.push('/login'); // Redirect to the login page
+      localStorage.removeItem('userRole'); // Clear user role on logout
+      this.isLoggedIn = false;
+      this.role = null; 
+      this.$router.push('/login');
     },
     updateLoginState() {
-      this.isLoggedIn = !!localStorage.getItem('token'); // Update state based on token
+      this.isLoggedIn = !!localStorage.getItem('token');
+      this.role = localStorage.getItem('userRole'); // Update role on login state change
     },
   },
   watch: {

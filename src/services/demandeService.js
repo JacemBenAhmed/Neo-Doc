@@ -60,7 +60,35 @@ export default {
       console.error('Error fetching demande by ID:', error);
       throw error;
     }
-  }
+  },
+  async getDemandesByUserid(id)
+  {
+    try{
+      const response = await axios.get(`${API_BASE_URL}/demandeUserId/${id}`);
+      return response.data ;
+
+    }
+    catch(error){
+      console.log(error) ;
+    }
+  } ,
+  async getStatusDmdUserId(status, id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/nbStatusDmdUserId/${id}`, {
+        params: { status: status }
+      });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching status demandes:', error);
+      throw error;
+    }
+  } ,
+  async updateStatus(id, newStatus) {
+    return await axios.put(`${API_BASE_URL}/updateStatus/${id}?status=${newStatus}`);
+  },
+  
+
 
 
 
