@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://localhost:7014/api/Services";
+const BASE_URL = "https://neodocs.azurewebsites.net/api/Services";
 
 async function getAllServices() {
   try {

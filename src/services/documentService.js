@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:7014/api/Document'; 
+const API_BASE_URL = 'https://neodocs.azurewebsites.net/api/Document'; 
 
 
 
 
-const API = 'https://localhost:7014/api/Document/';
+const API = 'https://neodocs.azurewebsites.net/api/Document/';
 export default {
  
   async createDocument(demandeId, documentTypes, file) {

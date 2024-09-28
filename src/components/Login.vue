@@ -41,7 +41,7 @@ export default {
         password: this.password,
       };
       try {
-        const response = await axios.post('https://localhost:7014/User/login', payload);
+        const response = await axios.post('https://neodocs.azurewebsites.net/User/login', payload);
 
         const token = response.data.token;
         localStorage.setItem('token', token);

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:7014/api/Services'; 
+const API_BASE_URL = 'https://neodocs.azurewebsites.net/api/Services'; 
 
 export default {
 

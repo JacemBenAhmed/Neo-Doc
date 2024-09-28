@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:7014', 
+  baseURL: 'https://neodocs.azurewebsites.net', 
   headers: {
     'Content-Type': 'application/json'
   }

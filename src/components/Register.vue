@@ -75,7 +75,7 @@ export default {
         role: this.role,
       };
       try {
-        const response = await axios.post('https://localhost:7014/User/register', payload);
+        const response = await axios.post('https://neodocs.azurewebsites.net/User/register', payload);
         console.log(response.data);
         alert('Registration successful');
         //this.$router.push('/login');

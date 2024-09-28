@@ -90,10 +90,10 @@ export default {
     },
 
     getDocumentType(mimeType) {
-      if (mimeType.includes('pdf')) return 'PDF';
-      else if (mimeType.includes('jpeg') || mimeType.includes('png')) return 'Image';
-      else if (mimeType.includes('mp4')) return 'Video';
-      else return 'Unknown';
+      if (mimeType.includes('pdf')) return 1;
+      else if (mimeType.includes('jpeg') || mimeType.includes('png')) return 0;
+      else if (mimeType.includes('mp4')) return 2;
+      else return 3;
     },
 
     async submitFiles() {
@@ -108,7 +108,7 @@ export default {
         }
 
         try {
-          const documentResponse = await documentService.createDocument(1021, documentTypes, fileObj);
+          const documentResponse = await documentService.createDocument(2060, documentTypes, fileObj);
           console.log('Document created successfully:', documentResponse);
         } catch (error) {
           console.error('Error creating document:', error.response?.data || error.message);
@@ -128,7 +128,7 @@ export default {
 
     async fetchDocuments() {
       try {
-        const response = await documentService.getDocumentByID(1021);
+        const response = await documentService.getDocumentByID(2060);
         console.log('API Response:', response);
 
         this.documents = Array.isArray(response.$values) ? response.$values.map(file => ({
