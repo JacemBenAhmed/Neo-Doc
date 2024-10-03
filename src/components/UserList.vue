@@ -10,10 +10,10 @@
         <thead>
           <tr>
             <th scope="col">User ID</th>
-            <th scope="col">firstName</th>
-            <th scope="col">LastName</th>
+            <th scope="col">Prenom</th>
+            <th scope="col">Nom</th>
             <th scope="col">Email</th>
-            <th scope="col">City</th>
+            <th scope="col">Cité</th>
             <th scope="col">Role</th>
             
           </tr>

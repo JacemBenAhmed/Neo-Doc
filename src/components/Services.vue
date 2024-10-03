@@ -7,7 +7,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Name</th>
+          <th>Nom du Service</th>
           <th>Description</th>
           <th>Actions</th>
         </tr>

@@ -11,7 +11,7 @@
           <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
             <i class="fas fa-file-alt text-primary" style="font-size: 2rem;"></i>
           </div>
-          <h5 class="fw-bold">Total Requests</h5>
+          <h5 class="fw-bold">Total Demandes</h5>
           <h2 class="fw-bold">{{ nbDemandes }}</h2>
         </div>
       </div>
@@ -21,7 +21,7 @@
           <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
             <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
           </div>
-          <h5 class="fw-bold">Requests Accepted</h5>
+          <h5 class="fw-bold">Demandes Acceptées</h5>
           <h2 class="fw-bold">{{ nbAccDemandes }}</h2>
         </div>
       </div>
@@ -31,7 +31,7 @@
           <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
             <i class="fas fa-times-circle text-danger" style="font-size: 2rem;"></i>
           </div>
-          <h5 class="fw-bold">Requests Rejected</h5>
+          <h5 class="fw-bold">Demandes Refusées</h5>
           <h2 class="fw-bold">{{ nbRefDemandes }}</h2>
         </div>
       </div>
@@ -42,7 +42,7 @@
         <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
         <i class="fas fa-hourglass-half text-warning" style="font-size: 2rem;"></i>
         </div>
-        <h5 class="fw-bold">Requests Pending</h5>
+        <h5 class="fw-bold">Demandes en Attente</h5>
         <h2 class="fw-bold">{{ nbAttDemandes }}</h2>
     </div>
     </div>
@@ -51,7 +51,7 @@
         <div class="bg-light rounded-circle p-4 mb-2 mx-auto" style="width: 80px; height: 80px;">
         <i class="fas fa-spinner text-primary" style="font-size: 2rem;"></i>
         </div>
-        <h5 class="fw-bold">Requests In Progress</h5>
+        <h5 class="fw-bold">Demandes en cours</h5>
         <h2 class="fw-bold">{{ nbCoursDemandes }}</h2>
     </div>
     </div>
@@ -61,11 +61,11 @@
 
     <div class="container mt-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold">ALL REQUESTS</h4>
+        <h4 class="fw-bold">Tous Demandes</h4>
         <div class="input-group w-25">
-          <input type="search" class="form-control" placeholder="Search" v-model="searchDemande" />
+          <input type="search" class="form-control" placeholder="Search by status" v-model="searchDemande" />
           <button class="btn btn-outline-secondary dropdown-toggle" type="button" @click="toggleSortOrder">
-            Sort by: {{ sortOrder }}
+            Sort by: {{ sortOrder }}  
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th scope="col">Request ID</th>
+            <th scope="col">Demande ID</th>
             <th scope="col">Date</th>
             <th scope="col">Service</th>
             <th scope="col">Status</th>

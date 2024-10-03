@@ -2,16 +2,16 @@
 <template >
   <center>
   <div class="container" >
-    <div class="title">Registration</div>
+    <div class="title">Creer un compte</div>
     <div class="content">
       <form @submit.prevent="register">
         <div class="user-details">
           <div class="input-box">
-            <span class="details">First Name</span>
+            <span class="details">Prenom</span>
             <input v-model="firstName" type="text" placeholder="Enter your first name" required>
           </div>
           <div class="input-box">
-            <span class="details">Last Name</span>
+            <span class="details">Nom</span>
             <input v-model="lastName" type="text" placeholder="Enter your last name" required>
           </div>
           <div class="input-box">
@@ -19,11 +19,11 @@
             <input v-model="email" type="email" placeholder="Enter your email" required>
           </div>
           <div class="input-box">
-            <span class="details">City</span>
+            <span class="details">Cité</span>
             <input v-model="city" type="text" placeholder="Enter your city" required>
           </div>
           <div class="input-box">
-            <span class="details">Phone Number</span>
+            <span class="details">Num tel</span>
             <input v-model="phoneNumber" type="text" placeholder="Enter your phone number" required>
           </div>
           <div class="input-box">

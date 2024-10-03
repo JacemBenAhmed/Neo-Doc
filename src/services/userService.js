@@ -1,34 +1,41 @@
 import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: 'https://neodocs.azurewebsites.net', 
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+const API_URL = 'https://neodocs.azurewebsites.net/User'; 
 
 export default {
-  register(user) {
-    return apiClient.post('/User/register', user);
-  },
-  login(credentials) {
-    return apiClient.post('/User/login', credentials);
-  },
-  getUsers(token) {
-    return apiClient.get('/User/users', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  },
-  getCurrentUser(token) {
-    return apiClient.get('/User/current', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  },
-  deleteUser(id, token) {
-    return apiClient.delete(`/User/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  }
+  async getUsers() {
+    try {
+      const response = await axios.get(`${API_URL}/users`);
+      return response;
+    } catch (error) {
+      throw new Error(`Error fetching user: ${error.message}`);
+    }
+  } ,
 
-  
+  async getUserById(userId) {
+    try {
+      const response = await axios.get(`${API_URL}/userByid/${userId}`);
+      return response;
+    } catch (error) {
+      throw new Error(`Error fetching user: ${error.message}`);
+    }
+  },
+
+  async updateUser(userId, userData) {
+    try {
+      const response = await axios.put(`${API_URL}/update/${userId}`, userData);
+      return response;
+    } catch (error) {
+      throw new Error(`Error updating user: ${error.message}`);
+    }
+  },
+
+  async deleteUser(userId) {
+    try {
+      const response = await axios.delete(`${API_URL}/delete/${userId}`);
+      return response;
+    } catch (error) {
+      throw new Error(`Error deleting user: ${error.message}`);
+    }
+  },
 };

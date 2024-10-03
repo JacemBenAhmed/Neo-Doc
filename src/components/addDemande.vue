@@ -1,18 +1,19 @@
 <template>
   <div class="container mt-4 p-4 shadow-sm bg-white rounded">
-    <h3 class="text-center mb-4">All Files</h3>
+    <h3 class="text-center mb-4">Tous les Fichiers </h3>
 
     <div class="table-responsive">
       <table class="table table-hover table-striped table-bordered text-center align-middle">
         <thead class="bg-primary text-white">
           <tr>
-            <th>File Name</th>
+            <th>Nom du Fichier</th>
             <th>Format</th>
             <th>User Id</th>
             <th>Service</th>
           </tr>
         </thead>
         <tbody>
+
           <tr v-for="(file, index) in files" :key="index">
             <td>{{ file.nomFichier }}</td>
             <td>{{ file.documentType }}</td>
@@ -31,7 +32,7 @@
     </div>
 
     <div class="text-center mt-4">
-      <button class="btn btn-success px-5" @click="submitDemande">Submit Demande</button>
+      <button class="btn btn-success px-5" @click="submitDemande">Ajout Demande</button>
     </div>
     
    
@@ -62,8 +63,9 @@ export default {
   },
   methods: {
     async fetchDocuments() {
+
   try {
-    const response = await documentService.getDocumentByID(2060);
+    const response = await documentService.getDocumentByID(2060); //fix and userId
     console.log('API Response:', response);
 
     this.files = Array.isArray(response.$values) ? response.$values.map(file => ({
@@ -113,6 +115,8 @@ export default {
   console.log(newDemandeId);
 
   await documentService.updateDocumentDemandeId(newDemandeId);
+  alert("update succ :!") ;
+
 } catch (error) {
   console.error('Error creating demande:', error.response?.data || error.message);
 }

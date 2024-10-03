@@ -1,36 +1,23 @@
 <template>
-  <div>
-    <Demandes v-if="isAdminOrAgent" />
-    <DashboradUser v-else-if="isClient" />
-  </div>
+  <div></div>
 </template>
 
 <script>
-import Demandes from "@/components/Demandes.vue";
-import DashboradUser from "@/components/DashboradUser.vue";
-
 export default {
   name: "Home",
-  components: {
-    Demandes,
-    DashboradUser
-  },
-  computed: {
-    isAdmin() {
-      return localStorage.getItem('userRole') === 'admin';
-    },
-    isAgent() {
-      return localStorage.getItem('userRole') === 'agent';
-    },
-    isClient() {
-      return localStorage.getItem('userRole') === 'client';
-    },
-    isAdminOrAgent() {
-      return this.isAdmin || this.isAgent;
+  created() {
+    const userRole = localStorage.getItem('userRole');
+
+    if (userRole === 'client') {
+      this.$router.push({ name: 'DashboardUsr' });
+    } else if (userRole === 'agent' || userRole === 'admin') {
+      this.$router.push({ name: 'demandes' });
+    } else {
+      this.$router.push({ name: 'login' });
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 </style>

@@ -10,14 +10,32 @@ import addDocs from '@/components/addDocs.vue';
 import addDemande from '@/components/addDemande.vue';
 import DashboradUser from '@/components/DashboradUser.vue';
 import editProfile from '@/components/editProfile.vue';
+import RegisterUser from '@/components/RegisterUser.vue';
 
 
 const routes = [
   {
-    name: 'demandes',
     path: '/',
+    redirect: (to) => {
+      const isAuthenticated = !!localStorage.getItem('token'); 
+      const userRole = localStorage.getItem('userRole');
+
+      if (isAuthenticated) {
+        if (userRole === 'client') {
+          return { name: 'DashboardUsr' };
+        } else if (userRole === 'agent' || userRole === 'admin') {
+          return { name: 'demandes' };
+        }
+      } else {
+        return { name: 'login' };
+      }
+    }
+  },
+  {
+    name: 'demandes',
+    path: '/demandes',
     component: Demandes,
-    meta: { requiresAuth: true, roles: ['admin', 'agent','client'] }, 
+    meta: { requiresAuth: true, roles: ['admin', 'agent'] }, 
   },
   {
     path: '/demande/:id',
@@ -36,6 +54,12 @@ const routes = [
     name: 'register',
     component: Register,
     meta: { requiresAuth: true, roles: ['admin'] },
+  },
+  {
+    path: '/registerUser',
+    name: 'registerUser',
+    component: RegisterUser,
+    
   },
   {
     path: '/users',

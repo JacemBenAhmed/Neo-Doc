@@ -1,10 +1,10 @@
 <template>
   <div class="container mt-4">
-    <h4 class="fw-bold mb-4">Request Details</h4>
+    <h4 class="fw-bold mb-4">Demande details</h4>
 
     <div v-if="demande" class="card shadow-sm">
       <div class="card-body">
-        <h5 class="card-title">Request ID: {{ demande.id }}</h5>
+        <h5 class="card-title">Demande ID: {{ demande.id }}</h5>
 
         <table class="table table-bordered">
           <tbody>
@@ -21,7 +21,7 @@
                     {{ status }}
                   </option>
                 </select>
-                <button class="btn btn-success mt-2" @click="updateStatus">Submit</button> <!-- Submit button -->
+                <button class="btn btn-success mt-2" @click="updateStatus">Confirmer</button>
               </td>
             </tr>
             <tr>
@@ -38,7 +38,7 @@
           </li>
         </ul>
 
-        <button class="btn btn-primary mt-4" @click="$router.go(-1)">Back</button>
+        <button class="btn btn-primary mt-4" @click="$router.go(-1)">Retour</button>
       </div>
     </div>
 
@@ -53,6 +53,7 @@
 <script>
 import demandeService from "@/services/demandeService.js";
 import documentService from "@/services/documentService.js";
+import userService from "@/services/userService.js"; // Added this line
 
 export default {
   name: "DemandeDetails",
@@ -63,6 +64,7 @@ export default {
       statusEx: ["En Attente", "En Cours", "Traité", "Refusé"],
       documents: [],
       newStatus: null, // Added for changing status
+      
     };
   },
   methods: {
@@ -88,10 +90,22 @@ export default {
         console.error("Error fetching documents:", error);
       }
     },
+    async getUserEmail() {
+      if (this.demande && this.demande.userId) {
+        try {
+          const user = await userService.getUserById(this.demande.userId);
+          this.userEmail = user.email; 
+        } catch (error) {
+          console.error("Error fetching user email:", error);
+        }
+      }
+    },
+   
     async updateStatus() {
       try {
         await demandeService.updateStatus(this.id, this.newStatus);
-        this.demande.statut = this.newStatus; // Update the status locally
+        this.demande.statut = this.newStatus; 
+
         alert("Status updated successfully!");
       } catch (error) {
         console.error("Error updating status:", error);
@@ -102,8 +116,9 @@ export default {
     try {
       const response = await demandeService.getDemandeById(this.id);
       this.demande = response;
-      this.newStatus = this.demande.statut; // Set the initial status
+      this.newStatus = this.demande.statut; 
       await this.getDocumentsById();
+      await this.getUserEmail(); 
     } catch (error) {
       console.error("Error loading demande details:", error);
     }

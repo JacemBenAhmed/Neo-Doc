@@ -1,47 +1,60 @@
 <template>
   <div class="upload-container p-4 shadow rounded">
-    <h4>Upload files</h4>
-    <p>Select and upload the files of your choice</p>
+    <h4 class="text-center mb-4">Upload Files</h4>
+    <p class="text-center">Select and upload the files of your choice</p>
 
     <div class="upload-box border rounded p-3 mb-3">
       <input
         type="file"
-        class="form-control-file"
+        class="form-control"
         @change="handleFileUpload"
         multiple
       />
     </div>
 
-    <div v-if="documents.length > 0" class="file-list">
+    <!-- Display the list of selected files -->
+    <div v-if="files.length > 0" class="file-list mt-3">
       <div
-        v-for="(file, index) in documents"
+        v-for="(file, index) in files"
         :key="index"
-        class="file-item d-flex align-items-center justify-content-between border p-2 mb-2"
+        class="file-item row align-items-center justify-content-between border p-2 mb-2"
       >
-        <div class="file-info d-flex align-items-center">
+        <div class="col-2 text-center">
+          <!-- View Button -->
+          <button class="btn btn-info btn-sm" @click="viewFile(file.fileObj)">
+            View
+          </button>
+        </div>
+        <div class="file-info col-6 col-md-8 d-flex align-items-center">
           <span class="file-icon me-2">
-            <i class="fa fa-file-pdf"></i>
+            <i class="fa fa-file-pdf fa-lg"></i>
           </span>
-          <div>
+          <div class="file-details">
             <p class="mb-0">{{ file.nomFichier }}</p>
             <small>{{ file.documentType }}</small>
           </div>
         </div>
-        <div>
-          <span v-if="file.uploading">Uploading...</span>
-          <span v-if="file.completed" class="text-success">Completed</span>
+        <!-- Button to remove a file -->
+        <div class="col-4 col-md-2 text-end">
+          <button class="btn btn-danger btn-sm" @click="removeFile(index)">
+            X
+          </button>
         </div>
       </div>
     </div>
 
-    <button class="btn btn-primary" @click="submitFiles" >
-      Confirm Submission
-    </button>
+    <!-- Buttons for actions -->
+    <div class="action-buttons mt-4 d-grid gap-2 d-sm-flex justify-content-sm-between">
+      <button class="btn btn-primary" @click="submitFiles" :disabled="!canSubmit">
+        Confirm Submission
+      </button>
 
-    <button class="btn btn-primary mt-2" @click="addDemande" >
-      Add Demande
-    </button>
-    <button class="btn btn-primary mt-2" @click="clearFiles">Clear Docs</button>
+      <button class="btn btn-primary" @click="addDemande">
+        Ajout Demande
+      </button>
+
+     
+    </div>
   </div>
 </template>
 
@@ -52,7 +65,7 @@ export default {
   data() {
     return {
       files: [],
-      documents: []
+      documents: [],
     };
   },
   computed: {
@@ -79,93 +92,82 @@ export default {
           newFile.completed = true;
         }, 2000);
       }
-
-      localStorage.setItem('uploadedFiles', JSON.stringify(this.files.map(f => ({
-        nomFichier: f.nomFichier,
-        documentType: f.documentType,
-        fileObj: f.fileObj,
-        uploading: f.uploading,
-        completed: f.completed
-      }))));
     },
 
     getDocumentType(mimeType) {
       if (mimeType.includes('pdf')) return 1;
       else if (mimeType.includes('jpeg') || mimeType.includes('png')) return 0;
       else if (mimeType.includes('mp4')) return 2;
-      else return 3;
+      return 3;
+    },
+
+    removeFile(index) {
+      this.files.splice(index, 1);
+    },
+
+    viewFile(file) {
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL, '_blank');
     },
 
     async submitFiles() {
+      documentService.deleteAllDocuments();
+
       console.log('Submitting files:', this.files);
       for (const file of this.files) {
-        const documentTypes = this.getDocumentType(file.nomFichier);
+        const documentType = this.getDocumentType(file.fileObj.type);
         const fileObj = file.fileObj;
 
-        if (!fileObj) {
-          console.error('File object is missing for:', file);
-          continue;
-        }
-
         try {
-          const documentResponse = await documentService.createDocument(2060, documentTypes, fileObj);
+          const documentResponse = await documentService.createDocument(2060, documentType, fileObj);
           console.log('Document created successfully:', documentResponse);
+          alert('Document uploaded successfully!');
         } catch (error) {
           console.error('Error creating document:', error.response?.data || error.message);
+          alert('Failed!');
         }
       }
     },
 
     addDemande() {
-      localStorage.setItem('uploadedFiles', JSON.stringify(this.files));
       this.$router.push('/addDemande');
     },
 
     clearFiles() {
+      this.files = [];
       this.documents = [];
-      //localStorage.removeItem('uploadedFiles');
     },
 
     async fetchDocuments() {
       try {
         const response = await documentService.getDocumentByID(2060);
-        console.log('API Response:', response);
-
-        this.documents = Array.isArray(response.$values) ? response.$values.map(file => ({
-          ...file,
-          uploading: false,
-          completed: true,
-        })) : [];
+        this.documents = Array.isArray(response.$values)
+          ? response.$values.map(file => ({
+              ...file,
+              uploading: false,
+              completed: true,
+            }))
+          : [];
       } catch (error) {
         console.error('Error fetching documents:', error.message);
       }
-
-      console.log("files: ", this.documents);
     },
   },
   mounted() {
-    this.fetchDocuments(); // Call fetchDocuments to get the documents on component mount
-
-    const storedFiles = localStorage.getItem('uploadedFiles');
-    if (storedFiles) {
-      this.files = JSON.parse(storedFiles).map(f => ({
-        ...f,
-        uploading: false,
-        completed: true,
-      }));
-    }
+    this.fetchDocuments();
   },
 };
 </script>
 
-<style scoped>
+<style>
 .upload-container {
-  max-width: 400px;
+  max-width: 100%;
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
 }
 
 .upload-box {
-  text-align: center;
   background-color: #f8f9fa;
 }
 
@@ -183,8 +185,32 @@ export default {
   color: #d9534f;
 }
 
+.file-details {
+  max-width: calc(100% - 40px);
+}
+
 button {
   width: 100%;
-  margin-top: 15px;
+}
+
+@media (min-width: 576px) {
+  .btn {
+    width: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .file-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .file-info {
+    justify-content: center;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
 }
 </style>

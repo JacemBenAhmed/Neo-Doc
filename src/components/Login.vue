@@ -1,22 +1,21 @@
-<!-- src/components/LoginForm.vue -->
 <template>
   <div class="container">
-    <div class="wrapper">
-      <div class="title">Login Form</div>
+    <div class="title">Se connecter</div>
+    <div class="content">
       <form @submit.prevent="login">
-        <div class="field">
-          <input v-model="email" type="text" required />
-          <label>Email Address</label>
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Email</span>
+            <input v-model="email" type="text" placeholder="Enter your email" required />
+          </div>
+          <div class="input-box">
+            <span class="details">Password</span>
+            <input v-model="password" type="password" placeholder="Enter your password" required />
+          </div>
         </div>
-        <div class="field">
-          <input v-model="password" type="password" required />
-          <label>Password</label>
-        </div>
-      
-        <div class="field">
+        <div class="button">
           <input type="submit" value="Login" />
         </div>
-        
       </form>
     </div>
   </div>
@@ -31,7 +30,6 @@ export default {
     return {
       email: '',
       password: '',
-      rememberMe: false,
     };
   },
   methods: {
@@ -45,31 +43,18 @@ export default {
 
         const token = response.data.token;
         localStorage.setItem('token', token);
-      
-        const decoded = VueJwtDecode.decode(token);
-        
-        localStorage.setItem('userRole', decoded.role); 
-        localStorage.setItem('userId', decoded.nameid); 
 
-        console.log(decoded.nameid) ;
-        console.log(decoded.role) ;
-         
-         
-        //alert('Login successful');
+        const decoded = VueJwtDecode.decode(token);
+        localStorage.setItem('userRole', decoded.role);
+        localStorage.setItem('userId', decoded.nameid);
 
         this.$router.push('/');
-
-
-
       } catch (error) {
         if (error.response) {
-          console.error('Error response', error.response.data);
           alert(`Login failed: ${error.response.data.message || 'Invalid credentials'}`);
         } else if (error.request) {
-          console.error('Error request', error.request);
           alert('Network error: Unable to reach the server');
         } else {
-          console.error('Error message', error.message);
           alert(`Error: ${error.message}`);
         }
       }
@@ -81,145 +66,115 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 
-html,
-body {
-  height: 100%;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
 }
 
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  max-width: 700px;
   width: 100%;
-  background: #f2f2f2;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-.wrapper {
-  width: 520px; /* Increased width */
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
-  padding: 30px; /* Increased padding */
-}
-
-.wrapper .title {
-  font-size: 35px;
-  font-weight: 600;
-  text-align: center;
-  line-height: 100px;
-  color: #fff;
-  user-select: none;
-  border-radius: 15px 15px 0 0;
-  background: linear-gradient(-135deg, #074b0a, #4158d0);
-}
-
-.wrapper form {
-  padding: 10px 30px 50px 30px;
-}
-
-.wrapper form .field {
-  height: 100px; /* Increased height */
-  width: 100%;
-  margin-top: 20px;
+.container .title {
+  font-size: 25px;
+  font-weight: 500;
   position: relative;
+  text-align: center;
 }
 
-.wrapper form .field input {
-  height: 100%;
+.container .title::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: 3px;
+  width: 50px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+.content form .user-details {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+form .user-details .input-box {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+form .input-box span.details {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.user-details .input-box input {
+  height: 45px;
   width: 100%;
   outline: none;
-  font-size: 20px; /* Increased font size */
-  padding-left: 20px;
-  border: 1px solid lightgrey;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.wrapper form .field input:focus,
-form .field input:valid {
-  border-color: #4158d0;
-}
-
-.wrapper form .field label {
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  color: #999999;
-  font-weight: 400;
-  font-size: 17px;
-  pointer-events: none;
-  transform: translateY(-50%);
-  transition: all 0.3s ease;
-}
-
-form .field input:focus ~ label,
-form .field input:valid ~ label {
-  top: 0%;
   font-size: 16px;
-  color: #0e5a21;
-  background: #fff;
-  transform: translateY(-50%);
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
 }
 
-form .content {
-  display: flex;
+.user-details .input-box input:focus,
+.user-details .input-box input:valid {
+  border-color: #9b59b6;
+}
+
+form .button {
+  height: 45px;
+  margin: 35px 0;
+}
+
+form .button input {
+  height: 100%;
   width: 100%;
-  height: 50px;
-  font-size: 16px;
-  align-items: center;
-  justify-content: space-around;
-}
-
-form .content .checkbox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-form .content input {
-  width: 15px;
-  height: 15px;
-  background: red;
-}
-
-form .content label {
-  color: #262626;
-  user-select: none;
-  padding-left: 5px;
-}
-
-form .field input[type='submit'] {
-  color: #fff;
+  border-radius: 5px;
   border: none;
-  padding-left: 0;
-  margin-top: -10px;
-  font-size: 30px; /* Increased font size */
+  color: #fff;
+  font-size: 18px;
   font-weight: 500;
+  letter-spacing: 1px;
   cursor: pointer;
-  background: linear-gradient(-135deg, #065031, #4158d0);
   transition: all 0.3s ease;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
 }
 
-form .field input[type='submit']:active {
-  transform: scale(0.95);
+form .button input:hover {
+  background: linear-gradient(-135deg, #71b7e6, #9b59b6);
 }
 
-form .signup-link {
-  color: #262626;
-  margin-top: 20px;
-  text-align: center;
-}
+@media(max-width: 584px) {
+  .container {
+    max-width: 100%;
+  }
 
-form .pass-link a,
-form .signup-link a {
-  color: #075220;
-  text-decoration: none;
-}
-
-form .pass-link a:hover,
-form .signup-link a:hover {
-  text-decoration: underline;
+  form .user-details .input-box {
+    margin-bottom: 15px;
+    width: 100%;
+  }
 }
 </style>

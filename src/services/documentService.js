@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://neodocs.azurewebsites.net/api/Document';
 
 
 
-const API = 'https://neodocs.azurewebsites.net/api/Document/';
+const API = 'https://neodocs.azurewebsites.net/Document/';
 export default {
  
   async createDocument(demandeId, documentTypes, file) {
@@ -39,6 +39,17 @@ export default {
       throw error;
     }
   }
+  ,
+  async deleteAllDocuments() {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/deleteByDemande`);
+      return response.data; 
+    } catch (error) {
+      console.error('Error deleting all documents:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+  
   
   
   ,
@@ -59,7 +70,7 @@ export default {
   
   async updateDocumentDemandeId(newDemandeId) {
     try {
-      const response = await axios.put(`${API}${newDemandeId}`);
+      const response = await axios.put(`${API_BASE_URL}/${newDemandeId}`);
       console.log('Documents updated successfully:', response.data);
       return response.data;
     } catch (error) {
